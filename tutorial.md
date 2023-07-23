@@ -564,11 +564,7 @@ After switching the network, Click on the *Add New Contract* option from the lef
 
 Now click on *Next*. As we have just one constructor in our contract, It will be chosen by default otherwise a dropdown option would have been present to select from multiple constructors. As our constructor `new()` accepts one parameter called `fees`. We need to set the *fees* field with a positive number. 
 
-{% hint style="info" %}  
-Note down that the default unit is set to *DOT* which multiplies the input by a factor of 10^4. So if we wish to pass a value say 10 (which corresponds to 1% trading fee, 10/1000 fraction, in our contract) then we need to write 0.0001 DOT.  
-{% endhint %}
-
-Set *endowment* to 1 DOT which transfers 1 DOT to the contract for storage rent. Finally set *max gas allowed (M)* to 200000. It will look something like this - 
+It will look something like this - 
 
 ![Deploy step 2](public/deploy2.png)
 
