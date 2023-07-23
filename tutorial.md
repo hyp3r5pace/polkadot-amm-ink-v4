@@ -590,6 +590,7 @@ import {
   web3FromSource,
 } from "@polkadot/extension-dapp";
 import { ContractPromise } from "@polkadot/api-contract";
+import BN from "bn.js";
 
 // Store your contract's ABI
 const CONTRACT_ABI = { ... };
@@ -611,12 +612,23 @@ const accountSigner = await web3FromSource(selectedAccount.meta.source).then(
   (res) => res.signer
 );
 
+// Returns the gasLimit and value in a object
+const getGasLimitAndValue = (value = 0) => {
+    if(props.api == null) {throw new Error("Failed to create gaslimit")}
+    const gasLimit = props.api.registry.createType("WeightV2", {
+        refTime: new BN("100000000000"),
+        proofSize: new BN("100000000000"),
+    });
+    const value = value;
+    return { gasLimit, value };
+  };
+
 // Fetch account holdings and display details (makes a query)
 const getAccountHoldings = async () => {
   let holdings = await contract.query
-    .getMyHoldings(selectedAccount.address, { value: 0, gasLimit: -1 })
+    .getMyHoldings(selectedAccount.address, getGasLimitAndValue())
     .then((res) => {
-      if (!res?.result?.toHuman()?.Err) return res.output.toHuman();
+      if (!res?.result?.toHuman()?.Err) return res.output.toHuman().Ok;
     });
   console.log("Account Holdings ", holdings);
 };
@@ -624,7 +636,7 @@ const getAccountHoldings = async () => {
 // Fund the account with given amount (makes a transaction)
 const faucet = async (amountKAR, amountKOTHI) => {
     await contract.tx
-    .faucet({ value: 0, gasLimit: -1 }, amountKAR, amountKOTHI)
+    .faucet(getGasLimitAndValue(), amountKAR, amountKOTHI)
     .signAndSend(
       selectedAccount.address,
       { signer: accountSigner },
@@ -681,7 +693,7 @@ To make a transaction we need to retrieve the signer from the account. Now we ar
 // Fetch account holdings and display details (makes a query)
 const getAccountHoldings = async () => {
   let holdings = await contract.query
-    .getMyHoldings(selectedAccount.address, { value: 0, gasLimit: -1 })
+    .getMyHoldings(selectedAccount.address, getGasLimitAndValue())
     .then((res) => {
       if (!res?.result?.toHuman()?.Err) return res.output.toHuman();
     });
@@ -689,13 +701,13 @@ const getAccountHoldings = async () => {
 };
 ```
 
-We have created a function **getAccountHoldings**, which makes a query to the **getMyHoldings** method of our smart contract. We pass the account address as the first parameter, 2nd parameter is an object with two keys, **value** only useful on isPayable messages, **gasLimit** sets the maximum gas our query can take. We have set **gasLimit** to **-1**, which indicates the limit is unbounded and can use the maximum available.
+We have created a function **getAccountHoldings**, which makes a query to the **getMyHoldings** method of our smart contract. We pass the account address as the first parameter, 2nd parameter is an object with two keys, **value** only useful on isPayable messages, **gasLimit** sets the maximum gas our query can take. We have set **gasLimit** in function **getGasLimitAndValue**.
 
 ```javascript
 // Fund the account with given amount (makes a transaction)
 const faucet = async (amountKAR, amountKOTHI) => {
     await contract.tx
-    .faucet({ value: 0, gasLimit: -1 }, amountKAR, amountKOTHI)
+    .faucet(getGasLimitAndValue(), amountKAR, amountKOTHI)
     .signAndSend(
       selectedAccount.address,
       { signer: accountSigner },
@@ -708,7 +720,7 @@ const faucet = async (amountKAR, amountKOTHI) => {
 }
 ```
 
-The function faucet makes a transaction to the **faucet** method of our smart contract. We pass the object with **value** and **gasLimit** keys as the first parameter and then we pass the other arguments required for the **faucet** method, the **amountKAR** and **amountKOTHI**. We then sign and send the transaction using the **signAndSend** method. To this method we pass the account address as the first parameter, an object containing the signer as the second parameter, and a callback function that calls the **getAccountHoldings** function when the transaction is Finalized.  
+The function faucet makes a transaction to the **faucet** method of our smart contract. We pass the object with **value** and **gasLimit** keys as the first parameter which is returned from function **getGasLimitAndValue** and then we pass the other arguments required for the **faucet** method, the **amountKAR** and **amountKOTHI**. We then sign and send the transaction using the **signAndSend** method. To this method we pass the account address as the first parameter, an object containing the signer as the second parameter, and a callback function that calls the **getAccountHoldings** function when the transaction is Finalized.  
 
 # Creating a frontend in React
 
@@ -723,8 +735,8 @@ cd /path/to/directory
 Now clone the GitHub repository, move into the newly `polkadot-amm` directory and install all the dependencies.
 
 ```text
-git clone https://github.com/realnimish/polkadot-amm.git
-cd polkadot-amm
+git clone https://github.com/hyp3r5pace/polkadot-amm-ink-v4.git
+cd polkadot-amm-ink-v4
 npm install
 ```
 
@@ -783,7 +795,7 @@ Make sure that you have added the account on the polkadot{.js} extension and the
 
 **Ink! project is not building**
 
-The ink! project is in active development because of which our current implementation might become incompatible with future releases. In that case, you can try to modify the contract or shift to ink v3.0.0-rc7.
+The ink! project is in active development because of which our current implementation might become incompatible with future releases.(This  tutorial uses ink v4.2)
 
 **Invalid JSON ABI structure supplied, expected a recent metadata version**
 
@@ -795,7 +807,7 @@ Make sure that you are providing a sufficient gas amount for the transaction and
 
 # About the Author(s)  
 
-The tutorial was created by [Sayan Kar](https://github.com/SayanKar) and [Nimish Agrawal](https://github.com/realnimish). You can reach out to them on [Figment Forum](https://community.figment.io/u/nimishagrawal100.in/) for any query regarding the tutorial.
+The tutorial was created by [Sayan Kar](https://github.com/SayanKar) and [Nimish Agrawal](https://github.com/realnimish) and [Soumyajit Deb](https://github.com/hyp3r5pace). 
 
 # References
 
