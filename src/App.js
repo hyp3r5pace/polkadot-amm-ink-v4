@@ -15,6 +15,7 @@ export default function App() {
   const [signer, setSigner] = useState(null);
   const [selectedTab, setSelectedTab] = useState("Swap");
   const [network, setNetwork] = useState({url: blockchainUrl, address: CONTRACT_ADDRESS});
+  const [api, setApi] = useState();
 
   useEffect(() => {
     (async () => {
@@ -34,12 +35,13 @@ export default function App() {
       console.log("Provider", wsProvider);
       const api = await ApiPromise.create({ provider: wsProvider });
       const contract = new ContractPromise(api, abi, address);
+      setApi(api);
       setMyContract(contract);
       setSelectedTab("Account");
       setNetwork({
         "url": url,
         "address": address
-      })
+      });
     } catch (err) {
       console.log("Couldn't connect to wallet :- ", err);
     }
@@ -90,6 +92,7 @@ export default function App() {
         setActiveTab={(val) => setSelectedTab(val)}
         setNetwork={(val) => setNetwork(val)}
         network={network}
+        api={api}
       />
     </div>
   );

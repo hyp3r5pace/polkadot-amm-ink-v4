@@ -120,6 +120,7 @@ export default function ContainerComponent(props) {
             activeAccount={props.activeAccount}
             signer={props.signer}
             holding={{ amountOfKAR, amountOfKOTHI, tradingFees }}
+            api={props.api}
           />
         )}
         {activeTab === "Provide" && (
@@ -129,6 +130,7 @@ export default function ContainerComponent(props) {
             activeAccount={props.activeAccount}
             signer={props.signer}
             holding={{ amountOfKAR, amountOfKOTHI }}
+            api={props.api}
           />
         )}
         {activeTab === "Withdraw" && (
@@ -138,6 +140,7 @@ export default function ContainerComponent(props) {
             getHoldings={() => getHoldings()}
             activeAccount={props.activeAccount}
             signer={props.signer}
+            api={props.api}
           />
         )}
         {activeTab === "Faucet" && (
@@ -146,6 +149,7 @@ export default function ContainerComponent(props) {
             getHoldings={() => getHoldings()}
             activeAccount={props.activeAccount}
             signer={props.signer}
+            api={props.api}
           />
         )}
         {activeTab === "Account" && (
@@ -165,6 +169,7 @@ export default function ContainerComponent(props) {
               totalKOTHI,
               tradingFees,
             }}
+            api={props.api}
           />
         )}
         {activeTab === "Settings" && (
@@ -174,6 +179,7 @@ export default function ContainerComponent(props) {
             connect={(url, addrs) => props.connect(url, addrs)}
             activeAccount={props.activeAccount}
             setActiveTab={(val) => props.setActiveTab(val)}
+            api={props.api}
           />
         )}
       </div>

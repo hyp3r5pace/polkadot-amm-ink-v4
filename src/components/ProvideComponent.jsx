@@ -3,11 +3,22 @@ import { useState } from "react";
 import "../styles.css";
 import BoxTemplate from "./BoxTemplate";
 import { PRECISION } from "../constants";
+import BN from "bn.js";
 
 export default function ProvideComponent(props) {
   const [amountOfKar, setAmountOfKar] = useState(0);
   const [amountOfKothi, setAmountOfKothi] = useState(0);
   const [error, setError] = useState("");
+
+  const getGasAndValue = () => {
+    if(props.api == null) {throw new Error("Failed to create gaslimit")}
+    const gasLimit = props.api.registry.createType("WeightV2", {
+        refTime: new BN("100000000000"),
+        proofSize: new BN("100000000000"),
+    });
+    const value = 0;
+    return { gasLimit, value };
+  };
 
   // Gets estimates of a token to be provided in the pool given the amount of other token
   const getProvideEstimate = async (token, value) => {
@@ -18,7 +29,7 @@ export default function ProvideComponent(props) {
           await props.contract.query
             .getEquivalentToken2Estimate(
               props.activeAccount.address,
-              { value: 0, gasLimit: -1 },
+              getGasAndValue(),
               value * PRECISION
             )
             .then((res) => (res = res.output.toHuman()))
@@ -41,7 +52,7 @@ export default function ProvideComponent(props) {
           await props.contract.query
             .getEquivalentToken1Estimate(
               props.activeAccount.address,
-              { value: 0, gasLimit: -1 },
+              getGasAndValue(),
               value * PRECISION
             )
             .then((res) => (res = res.output.toHuman()))
@@ -91,7 +102,7 @@ export default function ProvideComponent(props) {
         await props.contract.query
           .provide(
             props.activeAccount.address,
-            { value: 0, gasLimit: -1 },
+            getGasAndValue(),
             amountOfKar * PRECISION,
             amountOfKothi * PRECISION
           )
@@ -105,7 +116,7 @@ export default function ProvideComponent(props) {
               try {
                 await props.contract.tx
                   .provide(
-                    { value: 0, gasLimit: -1 },
+                    getGasAndValue(),
                     amountOfKar * PRECISION,
                     amountOfKothi * PRECISION
                   )

@@ -3,6 +3,7 @@ import { MdSwapVert } from "react-icons/md";
 import "../styles.css";
 import BoxTemplate from "./BoxTemplate";
 import { PRECISION } from "../constants";
+import BN from "bn.js";
 
 export default function SwapComponent(props) {
   const [coin, setCoin] = useState(["KAR", "KOTHI"]);
@@ -15,6 +16,16 @@ export default function SwapComponent(props) {
     getSwapEstimateAmountTo(amountFrom);
   };
 
+  const getGasAndValue = () => {
+    if(props.api == null) {throw new Error("Failed to create gaslimit")}
+    const gasLimit = props.api.registry.createType("WeightV2", {
+        refTime: new BN("100000000000"),
+        proofSize: new BN("100000000000"),
+    });
+    const value = 0;
+    return { gasLimit, value };
+  };
+
   // Given amount of token in AmountFrom, estimates amount of token in amountTo, i.e. tokens recieved after swap
   const getSwapEstimateAmountTo = async (val) => {
     if (["", "."].includes(val)) return;
@@ -24,7 +35,7 @@ export default function SwapComponent(props) {
           await props.contract.query
             .getSwapToken1EstimateGivenToken1(
               props.activeAccount.address,
-              { value: 0, gasLimit: -1 },
+              getGasAndValue(),
               val * PRECISION
             )
             .then((res) => res.output.toHuman())
@@ -40,7 +51,7 @@ export default function SwapComponent(props) {
           await props.contract.query
             .getSwapToken2EstimateGivenToken2(
               props.activeAccount.address,
-              { value: 0, gasLimit: -1 },
+              getGasAndValue(),
               val * PRECISION
             )
             .then((res) => res.output.toHuman())
@@ -69,7 +80,7 @@ export default function SwapComponent(props) {
           await props.contract.query
             .getSwapToken1EstimateGivenToken2(
               props.activeAccount.address,
-              { value: 0, gasLimit: -1 },
+              getGasAndValue(),
               val * PRECISION
             )
             .then((res) => res.output.toHuman())
@@ -85,7 +96,7 @@ export default function SwapComponent(props) {
           await props.contract.query
             .getSwapToken2EstimateGivenToken1(
               props.activeAccount.address,
-              { value: 0, gasLimit: -1 },
+              getGasAndValue(),
               val * PRECISION
             )
             .then((res) => res.output.toHuman())
@@ -130,7 +141,7 @@ export default function SwapComponent(props) {
           await props.contract.query
             .swapToken1GivenToken1(
               props.activeAccount.address,
-              { value: 0, gasLimit: -1 },
+              getGasAndValue(),
               amountFrom * PRECISION,
               ((amountTo * (100 - slippageTolerance)) / 100) * PRECISION
             )
@@ -143,7 +154,7 @@ export default function SwapComponent(props) {
               if (!res.Err) {
                 await props.contract.tx
                   .swapToken1GivenToken1(
-                    { value: 0, gasLimit: -1 },
+                    getGasAndValue(),
                     amountFrom * PRECISION,
                     ((amountTo * (100 - slippageTolerance)) / 100) * PRECISION
                   )
@@ -169,7 +180,7 @@ export default function SwapComponent(props) {
           await props.contract.query
             .swapToken2GivenToken2(
               props.activeAccount.address,
-              { value: 0, gasLimit: -1 },
+              getGasAndValue(),
               amountFrom * PRECISION,
               ((amountTo * (100 - slippageTolerance)) / 100) * PRECISION
             )
@@ -182,7 +193,7 @@ export default function SwapComponent(props) {
               if (!res.Err) {
                 await props.contract.tx
                   .swapToken2GivenToken2(
-                    { value: 0, gasLimit: -1 },
+                    getGasAndValue(),
                     amountFrom * PRECISION,
                     ((amountTo * (100 - slippageTolerance)) / 100) * PRECISION
                   )

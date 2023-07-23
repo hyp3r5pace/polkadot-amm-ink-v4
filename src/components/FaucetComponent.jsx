@@ -2,6 +2,7 @@ import { useState } from "react";
 import "../styles.css";
 import BoxTemplate from "./BoxTemplate";
 import { PRECISION } from "../constants";
+import BN from "bn.js";
 
 export default function FaucetComponent(props) {
   const [amountOfKar, setAmountOfKar] = useState(0);
@@ -13,6 +14,16 @@ export default function FaucetComponent(props) {
 
   const onChangeAmountOfKar = (e) => {
     setAmountOfKar(e.target.value);
+  };
+
+  const getGasAndValue = () => {
+    if(props.api == null) {throw new Error("Failed to create gaslimit")}
+    const gasLimit = props.api.registry.createType("WeightV2", {
+        refTime: new BN("100000000000"),
+        proofSize: new BN("100000000000"),
+    });
+    const value = 0;
+    return { gasLimit, value };
   };
 
   // Funds the account with given amount of Tokens
@@ -28,7 +39,7 @@ export default function FaucetComponent(props) {
     try {
       await props.contract.tx
         .faucet(
-          { value: 0, gasLimit: -1 },
+          getGasAndValue(),
           amountOfKar * PRECISION,
           amountOfKothi * PRECISION
         )
