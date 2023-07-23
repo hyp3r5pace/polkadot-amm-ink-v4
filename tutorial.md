@@ -628,7 +628,7 @@ const getAccountHoldings = async () => {
   let holdings = await contract.query
     .getMyHoldings(selectedAccount.address, getGasLimitAndValue())
     .then((res) => {
-      if (!res?.result?.toHuman()?.Err) return res.output.toHuman();
+      if (!res?.result?.toHuman()?.Err) return res.output.toHuman().Ok;
     });
   console.log("Account Holdings ", holdings);
 };
