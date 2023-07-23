@@ -556,7 +556,7 @@ Next, we need to fund our address to interact with the network. Go to the [fauce
 
 Now visit [https://contracts-ui.substrate.io/add-contract](https://contracts-ui.substrate.io/add-contract) and switch to the Aleph Zero testnet. You can do this by clicking on the drop-down component available on the top-left of the navbar where you will see a list of available networks. Move to the *"TEST NETWORKS"* section and search for a network called **ALEPH ZERO TESTNET**. Select it and the network will switch to **ALEPH ZERO TESTNET**.
 
-![Switch Network](public/polkadot-js.png)
+![Switch Network](public/Screenshot (101))
 
 After switching the network, Click on the *Contracts* option under the *Developer* tab from the navbar. There click on *Upload & Deploy Code* and select the account through which you wish to deploy and in the field - *"json for either ABI or .contract bundle"* upload the `metadata.json` file. Next a new field - *"compiled contract WASM"* will emerge where you need to upload your wasm file i.e. `amm.wasm` in our case. It will look something like this - 
 
