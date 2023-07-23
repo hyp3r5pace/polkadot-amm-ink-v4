@@ -558,7 +558,7 @@ Now visit [https://contracts-ui.substrate.io/add-contract](https://contracts-ui.
 
 ![Switch Network](public/deploy-azero-1.png)
 
-After switching the network, Click on the *Contracts* option under the *Developer* tab from the navbar. There click on *Upload & Deploy Code* and select the account through which you wish to deploy and in the field - *"json for either ABI or .contract bundle"* upload the `metadata.json` file. Next a new field - *"compiled contract WASM"* will emerge where you need to upload your wasm file i.e. `amm.wasm` in our case. It will look something like this - 
+After switching the network, Click on the *Add New Contract* option from the left sidebar. Then click on *Upload New Contract Code* option. There click on *Upload & Deploy Code*. In the new page, select the account through which you wish to deploy and give a name to the contract you are going to upload. In the *Upload Contract Bundle* field, upload the contract code file  It will look something like this - 
 
 ![Deploy step 1](public/deploy1.png)
 
