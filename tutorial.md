@@ -560,7 +560,7 @@ Now visit [https://contracts-ui.substrate.io/add-contract](https://contracts-ui.
 
 After switching the network, Click on the *Add New Contract* option from the left sidebar. Then click on *Upload New Contract Code* option. There click on *Upload & Deploy Code*. In the new page, select the account through which you wish to deploy and give a name to the contract you are going to upload. In the *Upload Contract Bundle* field, upload the contract code file  It will look something like this - 
 
-![Deploy step 1](public/deploy1.png)
+![Deploy step 1](public/deploy-contract-2.png)
 
 Now click on *Next*. As we have just one constructor in our contract, It will be chosen by default otherwise a dropdown option would have been present to select from multiple constructors. As our constructor `new()` accepts one parameter called `fees`. We need to set the *fees* field with a positive number. 
 
