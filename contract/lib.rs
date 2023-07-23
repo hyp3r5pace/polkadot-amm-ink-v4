@@ -1,13 +1,11 @@
-#![cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(not(feature = "std"), no_std, no_main)]
 #![allow(non_snake_case)]
-
-use ink_lang as ink;
 
 const PRECISION: u128 = 1_000_000; // Precision of 6 digits
 
 #[ink::contract]
 mod amm {
-    use ink_storage::collections::HashMap;
+    use ink::storage::{traits::StorageKey, Mapping};
 
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
     #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
@@ -36,22 +34,22 @@ mod amm {
         totalShares: Balance, // Stores the total amount of share issued for the pool
         totalToken1: Balance, // Stores the amount of Token1 locked in the pool
         totalToken2: Balance, // Stores the amount of Token2 locked in the pool
-        shares: HashMap<AccountId, Balance>, // Stores the share holding of each provider
-        token1Balance: HashMap<AccountId, Balance>, // Stores the token1 balance of each user
-        token2Balance: HashMap<AccountId, Balance>, // Stores the token2 balance of each user
+        shares: Mapping<AccountId, Balance>, // Stores the share holding of each provider
+        token1Balance: Mapping<AccountId, Balance>, // Stores the token1 balance of each user
+        token2Balance: Mapping<AccountId, Balance>, // Stores the token2 balance of each user
         fees: Balance,        // Percent of trading fees charged on trade
     }
 
     #[ink(impl)]
     impl Amm {
         // Ensures that the _qty is non-zero and the user has enough balance
-        fn validAmountCheck(
+        fn validAmountCheck<Key: StorageKey>(
             &self,
-            _balance: &HashMap<AccountId, Balance>,
+            _balance: &Mapping<AccountId, Balance, Key>,
             _qty: Balance,
         ) -> Result<(), Error> {
             let caller = self.env().caller();
-            let my_balance = *_balance.get(&caller).unwrap_or(&0);
+            let my_balance = _balance.get(&caller).unwrap_or(0);
 
             match _qty {
                 0 => Err(Error::ZeroAmount),
@@ -90,20 +88,20 @@ mod amm {
         #[ink(message)]
         pub fn faucet(&mut self, _amountToken1: Balance, _amountToken2: Balance) {
             let caller = self.env().caller();
-            let token1 = *self.token1Balance.get(&caller).unwrap_or(&0);
-            let token2 = *self.token2Balance.get(&caller).unwrap_or(&0);
+            let token1 = self.token1Balance.get(&caller).unwrap_or(0);
+            let token2 = self.token2Balance.get(&caller).unwrap_or(0);
 
-            self.token1Balance.insert(caller, token1 + _amountToken1);
-            self.token2Balance.insert(caller, token2 + _amountToken2);
+            self.token1Balance.insert(caller, &(token1 + _amountToken1));
+            self.token2Balance.insert(caller, &(token2 + _amountToken2));
         }
 
         /// Returns the balance of the user
         #[ink(message)]
         pub fn getMyHoldings(&self) -> (Balance, Balance, Balance) {
             let caller = self.env().caller();
-            let token1 = *self.token1Balance.get(&caller).unwrap_or(&0);
-            let token2 = *self.token2Balance.get(&caller).unwrap_or(&0);
-            let myShares = *self.shares.get(&caller).unwrap_or(&0);
+            let token1 = self.token1Balance.get(&caller).unwrap_or(0);
+            let token2 = self.token2Balance.get(&caller).unwrap_or(0);
+            let myShares = self.shares.get(&caller).unwrap_or(0);
             (token1, token2, myShares)
         }
 
@@ -168,18 +166,17 @@ mod amm {
             }
 
             let caller = self.env().caller();
-            let token1 = *self.token1Balance.get(&caller).unwrap();
-            let token2 = *self.token2Balance.get(&caller).unwrap();
-            self.token1Balance.insert(caller, token1 - _amountToken1);
-            self.token2Balance.insert(caller, token2 - _amountToken2);
+            let token1 = self.token1Balance.get(&caller).unwrap();
+            let token2 = self.token2Balance.get(&caller).unwrap();
+            self.token1Balance.insert(caller, &(token1 - _amountToken1));
+            self.token2Balance.insert(caller, &(token2 - _amountToken2));
 
             self.totalToken1 += _amountToken1;
             self.totalToken2 += _amountToken2;
             self.totalShares += share;
-            self.shares
-                .entry(caller)
-                .and_modify(|val| *val += share)
-                .or_insert(share);
+
+            let shares = self.shares.get(caller).unwrap_or(0);
+            self.shares.insert(&caller, &(shares + share));
 
             Ok(share)
         }
@@ -204,18 +201,22 @@ mod amm {
             self.validAmountCheck(&self.shares, _share)?;
 
             let (amountToken1, amountToken2) = self.getWithdrawEstimate(_share)?;
-            self.shares.entry(caller).and_modify(|val| *val -= _share);
+
+            let shares = self.shares.get(caller).expect("Infallible");
+            self.shares.insert(&caller, &(shares - _share));
+
             self.totalShares -= _share;
 
             self.totalToken1 -= amountToken1;
             self.totalToken2 -= amountToken2;
 
+            let balance1 = self.token1Balance.get(caller).unwrap_or(0);
             self.token1Balance
-                .entry(caller)
-                .and_modify(|val| *val += amountToken1);
+                .insert(&caller, &(balance1 + amountToken1));
+
+            let balance2 = self.token2Balance.get(caller).unwrap_or(0);
             self.token2Balance
-                .entry(caller)
-                .and_modify(|val| *val += amountToken2);
+                .insert(&caller, &(balance2 + amountToken2));
 
             Ok((amountToken1, amountToken2))
         }
@@ -272,16 +273,18 @@ mod amm {
             if amountToken2 < _minToken2 {
                 return Err(Error::SlippageExceeded);
             }
+
+            let balance1 = self.token1Balance.get(caller).expect("Infallible");
             self.token1Balance
-                .entry(caller)
-                .and_modify(|val| *val -= _amountToken1);
+                .insert(&caller, &(balance1 - _amountToken1));
 
             self.totalToken1 += _amountToken1;
             self.totalToken2 -= amountToken2;
 
+            let balance2 = self.token2Balance.get(caller).unwrap_or(0);
             self.token2Balance
-                .entry(caller)
-                .and_modify(|val| *val += amountToken2);
+                .insert(&caller, &(balance2 + amountToken2));
+
             Ok(amountToken2)
         }
 
@@ -300,16 +303,17 @@ mod amm {
             }
             self.validAmountCheck(&self.token1Balance, amountToken1)?;
 
+            let balance1 = self.token1Balance.get(caller).expect("Infallible");
             self.token1Balance
-                .entry(caller)
-                .and_modify(|val| *val -= amountToken1);
+                .insert(&caller, &(balance1 - amountToken1));
 
             self.totalToken1 += amountToken1;
             self.totalToken2 -= _amountToken2;
 
+            let balance2 = self.token2Balance.get(caller).unwrap_or(0);
             self.token2Balance
-                .entry(caller)
-                .and_modify(|val| *val += _amountToken2);
+                .insert(&caller, &(balance2 + _amountToken2));
+
             Ok(amountToken1)
         }
 
@@ -365,16 +369,18 @@ mod amm {
             if amountToken1 < _minToken1 {
                 return Err(Error::SlippageExceeded);
             }
+
+            let balance2 = self.token2Balance.get(caller).expect("Infallible");
             self.token2Balance
-                .entry(caller)
-                .and_modify(|val| *val -= _amountToken2);
+                .insert(&caller, &(balance2 - _amountToken2));
 
             self.totalToken2 += _amountToken2;
             self.totalToken1 -= amountToken1;
 
+            let balance1 = self.token1Balance.get(caller).unwrap_or(0);
             self.token1Balance
-                .entry(caller)
-                .and_modify(|val| *val += amountToken1);
+                .insert(&caller, &(balance1 - amountToken1));
+
             Ok(amountToken1)
         }
 
@@ -394,16 +400,17 @@ mod amm {
             }
             self.validAmountCheck(&self.token2Balance, amountToken2)?;
 
+            let balance2 = self.token2Balance.get(caller).expect("Infallible");
             self.token2Balance
-                .entry(caller)
-                .and_modify(|val| *val -= amountToken2);
+                .insert(&caller, &(balance2 - amountToken2));
 
             self.totalToken2 += amountToken2;
             self.totalToken1 -= _amountToken1;
 
+            let balance1 = self.token1Balance.get(caller).unwrap_or(0);
             self.token1Balance
-                .entry(caller)
-                .and_modify(|val| *val += _amountToken1);
+                .insert(&caller, &(balance1 - _amountToken1));
+
             Ok(amountToken2)
         }
     }
@@ -411,7 +418,6 @@ mod amm {
     #[cfg(test)]
     mod tests {
         use super::*;
-        use ink_lang as ink;
 
         #[ink::test]
         fn new_works() {
