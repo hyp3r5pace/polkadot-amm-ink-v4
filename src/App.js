@@ -45,6 +45,16 @@ export default function App() {
     }
   }
 
+  const openSelectAccountTab = () => {
+    setSelectedTab("SelectAccount");
+  };
+
+  const onConnectWalletClick = () => {
+    connect();
+    openSelectAccountTab();
+  };
+
+
   return (
     <div className="pageBody">
       <div className="navBar">
@@ -53,12 +63,12 @@ export default function App() {
           AMM <GiBodySwapping className="appnameIcon" />
         </div>
         {myContract === null || activeAccount == null ? (
-          <div className="connectBtn" onClick={() => connect()}>
+          <div className="connectBtn" onClick={() => onConnectWalletClick()}>
             <RiWallet3Fill className="accountIcon" />
             <div className="connectWalletText">Connect your wallet</div>
           </div>
         ) : (
-          <div className="connected">
+          <div className="connected" onClick={() => openSelectAccountTab()}>
             <Identicon
               value={activeAccount.address}
               size={32}

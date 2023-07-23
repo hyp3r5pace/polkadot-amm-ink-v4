@@ -1,6 +1,6 @@
 export const PRECISION = 1000000;
 export const RE = /^[0-9]*[.]?[0-9]{0,6}$/;
-export const blockchainUrl =  "wss://ws.jupiter-poa.patract.cn/";
+export const blockchainUrl =  "wss://aleph-zero-testnet-rpc.dwellir.com";
 // Replace the below address with the address of the contract you deployed 
 export const CONTRACT_ADDRESS = "5CUq8TpEVXKcgoB75fZQzjcFN7ZExyJGSZEEwYApUhRtGygK";
 // Replace the below abi with the abi of the contract you deployed
