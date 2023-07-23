@@ -570,7 +570,7 @@ It will look something like this -
 
 Click on *Next* followed by *Upload and Instantiate*. Wait for the Tx to be mined and after a few seconds, you can see the updated contract page with the list of your deployed contracts. Click on the name of your contract to see the contract address and note it down as it will be needed when integrating with the frontend.
 
-![Find contract address](public/contract-address.png)
+![Find contract address](public/deploy-contract-4.png)
 
 # How to interact with polkadot.{js}
 
