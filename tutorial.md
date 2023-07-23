@@ -747,7 +747,7 @@ In our react application we keep all the React components in the `src/components
 It renders the box containing the input field, its header, and the element on the right of the box, which can be a token name account balance, a button, or is empty.
 
 * **FaucetComponent** :-
- Takes amount of token1 (KAR) and token2 (KOTHI) as input and funds the user address with that much amount.
+Takes amount of token1 (KAR) and token2 (KOTHI) as input and funds the user address with that much amount.
 
 * **ProvideComponent** :-
 Takes amount of one token (KAR or KOTHI) fills in the estimated amount of the other token and helps provide liquidity to the pool.
@@ -763,6 +763,9 @@ Shows the pool detail and the account details. It enables to switch between acco
 
 * **ContainerComponent** :- 
 This component renders the main body of our application which contains the center box, the tabs to switch between the five components Swap, Provide, Faucet, Withdraw, Account.
+
+* **SettingComponent** :-
+This component will enable the change of network and contract address. If someone wishes to deploy their own contract and test it out, they can change the **Blockchain endpoint** and provide their own **Contract address** from the UI.
 
 The `App.js` renders the `ContainerComponent` and connects the application to `polkadot.{js}`. 
 
