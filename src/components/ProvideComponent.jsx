@@ -32,7 +32,7 @@ export default function ProvideComponent(props) {
               getGasAndValue(),
               value * PRECISION
             )
-            .then((res) => (res = res.output.toHuman()))
+            .then((res) => (res = res.output.toHuman().Ok))
             .then((res) => {
               console.log(res);
               if (res.Err) {
@@ -45,6 +45,7 @@ export default function ProvideComponent(props) {
                   console.log(res.Err);
                 }
               } else {
+                console.log(res);
                 setAmountOfKothi(res.Ok.replace(/,/g, "") / PRECISION);
               }
             });
@@ -55,7 +56,7 @@ export default function ProvideComponent(props) {
               getGasAndValue(),
               value * PRECISION
             )
-            .then((res) => (res = res.output.toHuman()))
+            .then((res) => (res = res.output.toHuman().Ok))
             .then((res) => {
               if (res.Err) {
                 if (res.Err.includes("ZeroLiquidity")) {

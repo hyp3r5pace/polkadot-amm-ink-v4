@@ -10,6 +10,7 @@ import { PRECISION } from "../constants";
 import { MdSwapVert } from "react-icons/md";
 import { GiWaterDrop } from "react-icons/gi";
 import { RiRefundFill, RiHandCoinFill, RiWallet3Fill, RiSettings4Fill } from "react-icons/ri";
+import BN from "bn.js";
 
 export default function ContainerComponent(props) {
   const activeTab = props.selectedTab;
@@ -26,6 +27,16 @@ export default function ContainerComponent(props) {
     getHoldings();
   });
 
+  const getGasAndValue = () => {
+    if(props.api == null) {throw new Error("Failed to create gaslimit")}
+    const gasLimit = props.api.registry.createType("WeightV2", {
+        refTime: new BN("100000000000"),
+        proofSize: new BN("100000000000"),
+    });
+    const value = 0;
+    return { gasLimit, value };
+  };
+
   // Fetch the pool details and personal assets details.
   async function getHoldings() {
     if (props.contract === null || !props?.activeAccount?.address) {
@@ -33,13 +44,14 @@ export default function ContainerComponent(props) {
     }
     try {
       await props.contract.query
-        .getMyHoldings(props.activeAccount.address, { value: 0, gasLimit: -1 })
+        .getMyHoldings(props.activeAccount.address, getGasAndValue())
         .then((res) => {
           if (res.result.toHuman().Err)
             throw new Error(res.result.toHuman().Err.Module.message);
-          else return res.output.toHuman();
+          else return res.output.toHuman().Ok;
         })
         .then((res) => {
+          console.log("getMyHoldings", res)
           setAmountOfKAR(res[0].replace(/,/g, "") / PRECISION);
           setAmountOfKOTHI(res[1].replace(/,/g, "") / PRECISION);
           setAmountOfShare(res[2].replace(/,/g, "") / PRECISION);
@@ -49,11 +61,11 @@ export default function ContainerComponent(props) {
           alert(err);
         });
       await props.contract.query
-        .getPoolDetails(props.activeAccount.address, { value: 0, gasLimit: -1 })
+        .getPoolDetails(props.activeAccount.address, getGasAndValue())
         .then((res) => {
           if (res.result.toHuman().Err)
             throw new Error(res.result.toHuman().Err.Module.message);
-          else return res.output.toHuman();
+          else return res.output.toHuman().Ok;
         })
         .then((res) => {
           setTotalKAR(res[0].replace(/,/g, "") / PRECISION);

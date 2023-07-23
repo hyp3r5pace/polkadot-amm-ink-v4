@@ -12,6 +12,7 @@
   --light-grey: #d5cdd0;
   --dark-grey: #a19a9d;
 }
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -19,6 +20,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: 'Lato', sans-serif;
 }
 
 code {
@@ -341,6 +343,7 @@ body,
 .appnameIcon {
   height: 28px;
   width: 28px;
+  margin-bottom: -3px;
   color: var(--polkapink);
 }
 .middleIcon:hover {

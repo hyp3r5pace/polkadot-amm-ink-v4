@@ -32,7 +32,7 @@ export default function WithdrawComponent(props) {
                         getGasAndValue(),
                         e.target.value * PRECISION
                     )
-                    .then((res) => res.output.toHuman())
+                    .then((res) => res.output.toHuman().Ok)
                     .then((res) => {
                         if (!res.Err) {
                             setEstimateTokens([
@@ -61,7 +61,7 @@ export default function WithdrawComponent(props) {
                     getGasAndValue(),
                     props.maxShare * PRECISION
                 )
-                .then((res) => res.output.toHuman())
+                .then((res) => res.output.toHuman().Ok)
                 .then((res) => {
                     if (!res.Err) {
                         setEstimateTokens([

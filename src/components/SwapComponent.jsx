@@ -38,7 +38,7 @@ export default function SwapComponent(props) {
               getGasAndValue(),
               val * PRECISION
             )
-            .then((res) => res.output.toHuman())
+            .then((res) => res.output.toHuman().Ok)
             .then((res) => {
               if (!res.Err) {
                 setAmountTo(res.Ok.replace(/,/g, "") / PRECISION);
@@ -54,7 +54,7 @@ export default function SwapComponent(props) {
               getGasAndValue(),
               val * PRECISION
             )
-            .then((res) => res.output.toHuman())
+            .then((res) => res.output.toHuman().Ok)
             .then((res) => {
               if (!res.Err) {
                 setAmountTo(res.Ok.replace(/,/g, "") / PRECISION);
@@ -83,7 +83,7 @@ export default function SwapComponent(props) {
               getGasAndValue(),
               val * PRECISION
             )
-            .then((res) => res.output.toHuman())
+            .then((res) => res.output.toHuman().Ok)
             .then((res) => {
               if (!res.Err) {
                 setAmountFrom(res.Ok.replace(/,/g, "") / PRECISION);
@@ -99,7 +99,7 @@ export default function SwapComponent(props) {
               getGasAndValue(),
               val * PRECISION
             )
-            .then((res) => res.output.toHuman())
+            .then((res) => res.output.toHuman().Ok)
             .then((res) => {
               if (!res.Err) {
                 setAmountFrom(res.Ok.replace(/,/g, "") / PRECISION);
@@ -142,8 +142,8 @@ export default function SwapComponent(props) {
             .swapToken1GivenToken1(
               props.activeAccount.address,
               getGasAndValue(),
-              amountFrom * PRECISION,
-              ((amountTo * (100 - slippageTolerance)) / 100) * PRECISION
+              new BN(amountFrom).mul(new BN(PRECISION)),
+              ((new BN(amountTo).mul(new BN(100 - slippageTolerance))).div(new BN(100))).mul(new BN(PRECISION))
             )
             .then((res) => {
               if (res.result.toHuman().Err?.Module?.message)
@@ -155,8 +155,8 @@ export default function SwapComponent(props) {
                 await props.contract.tx
                   .swapToken1GivenToken1(
                     getGasAndValue(),
-                    amountFrom * PRECISION,
-                    ((amountTo * (100 - slippageTolerance)) / 100) * PRECISION
+                    new BN(amountFrom).mul(new BN(PRECISION)),
+                    ((new BN(amountTo).mul(new BN(100 - slippageTolerance))).div(new BN(100))).mul(new BN(PRECISION))
                   )
                   .signAndSend(
                     props.activeAccount.address,
@@ -181,8 +181,8 @@ export default function SwapComponent(props) {
             .swapToken2GivenToken2(
               props.activeAccount.address,
               getGasAndValue(),
-              amountFrom * PRECISION,
-              ((amountTo * (100 - slippageTolerance)) / 100) * PRECISION
+              new BN(amountFrom).mul(new BN(PRECISION)),
+              ((new BN(amountTo).mul(new BN(100 - slippageTolerance))).div(new BN(100))).mul(new BN(PRECISION))
             )
             .then((res) => {
               if (res.result.toHuman().Err?.Module?.message)
@@ -194,8 +194,8 @@ export default function SwapComponent(props) {
                 await props.contract.tx
                   .swapToken2GivenToken2(
                     getGasAndValue(),
-                    amountFrom * PRECISION,
-                    ((amountTo * (100 - slippageTolerance)) / 100) * PRECISION
+                    new BN(amountFrom).mul(new BN(PRECISION)),
+                    ((new BN(amountTo).mul(new BN(100 - slippageTolerance))).div(new BN(100))).mul(new BN(PRECISION))
                   )
                   .signAndSend(
                     props.activeAccount.address,
