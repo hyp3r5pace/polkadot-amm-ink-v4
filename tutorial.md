@@ -542,7 +542,7 @@ Next, we will learn how to deploy the contract on a public testnet in the next s
 
 # Deploying the smart contract
 
-We will deploy our ink! smart contract on Jupiter A1 testnet of Patract ([More info](https://docs.patract.io/en/jupiter/network)). If you wish to deploy on a local node or some other testnet instead, change the `blockchainUrl` variable in [src/constants.js](src/constants.js) file to point to their respective endpoint. 
+We will deploy our ink! smart contract on Aleph Zero testnet ([More info](https://docs.alephzero.org/aleph-zero/)). If you wish to deploy on a local node or some other testnet instead, change the `blockchainUrl` variable in [src/constants.js](src/constants.js) file to point to their respective endpoint. 
 
 First, we need to build our ink! project to obtain the necessary artifacts. From your ink! project directory run the following command in the terminal:
 
@@ -552,7 +552,7 @@ cargo +nightly contract build --release
 
 This will generate the artifacts at `./target/ink`. We will use the `amm.wasm` and `metadata.json` (*It is the ABI of our contract and it will be needed when we integrate it with the frontend of our dApp*) files to deploy our smart contract.
 
-Next, we need to fund our address to interact with the network. Go to the [faucet](https://patrastore.io/#/jupiter-a1/system/accounts) to get some testnet tokens. 
+Next, we need to fund our address to interact with the network. Go to the [faucet](https://faucet.test.azero.dev/) to get some Aleph Zero testnet tokens (AZERO). 
 
 Now visit [https://polkadot.js.org/apps](https://polkadot.js.org/apps) and switch to the Jupiter testnet. You can do this by clicking on the chain logo available on the top-left of the navbar where you will see a list of available networks. Move to the *"TEST NETWORKS"* section and search for a network called **Jupiter**. Select it and scroll back to the top and click on *Switch*.
 
