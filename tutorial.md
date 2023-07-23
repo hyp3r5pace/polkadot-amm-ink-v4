@@ -566,9 +566,9 @@ Now click on *Next*. As we have just one constructor in our contract, It will be
 
 It will look something like this - 
 
-![Deploy step 2](public/deploy2.png)
+![Deploy step 2](public/deploy-contract-3.png)
 
-Click on *Deploy* followed by *Sign and Submit*. Wait for the Tx to be mined and after a few seconds, you can see the updated contract page with the list of your deployed contracts. Click on the name of your contract to see the contract address and note it down as it will be needed when integrating with the frontend.
+Click on *Next* followed by *Upload and Instantiate*. Wait for the Tx to be mined and after a few seconds, you can see the updated contract page with the list of your deployed contracts. Click on the name of your contract to see the contract address and note it down as it will be needed when integrating with the frontend.
 
 ![Find contract address](public/contract-address.png)
 
