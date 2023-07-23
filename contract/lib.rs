@@ -1,5 +1,4 @@
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
-#![allow(non_snake_case)]
 
 const PRECISION: u128 = 1_000_000; // Precision of 6 digits
 
@@ -31,41 +30,41 @@ mod amm {
     #[derive(Default)]
     #[ink(storage)]
     pub struct Amm {
-        totalShares: Balance, // Stores the total amount of share issued for the pool
-        totalToken1: Balance, // Stores the amount of Token1 locked in the pool
-        totalToken2: Balance, // Stores the amount of Token2 locked in the pool
+        total_shares: Balance, // Stores the total amount of share issued for the pool
+        total_token1: Balance, // Stores the amount of Token1 locked in the pool
+        total_token2: Balance, // Stores the amount of Token2 locked in the pool
         shares: Mapping<AccountId, Balance>, // Stores the share holding of each provider
-        token1Balance: Mapping<AccountId, Balance>, // Stores the token1 balance of each user
-        token2Balance: Mapping<AccountId, Balance>, // Stores the token2 balance of each user
+        token1_balance: Mapping<AccountId, Balance>, // Stores the token1 balance of each user
+        token2_balance: Mapping<AccountId, Balance>, // Stores the token2 balance of each user
         fees: Balance,        // Percent of trading fees charged on trade
     }
 
     #[ink(impl)]
     impl Amm {
-        // Ensures that the _qty is non-zero and the user has enough balance
-        fn validAmountCheck<Key: StorageKey>(
+        // Ensures that the qty is non-zero and the user has enough balance
+        fn valid_amount_check<Key: StorageKey>(
             &self,
-            _balance: &Mapping<AccountId, Balance, Key>,
-            _qty: Balance,
+            balance: &Mapping<AccountId, Balance, Key>,
+            qty: Balance,
         ) -> Result<(), Error> {
             let caller = self.env().caller();
-            let my_balance = _balance.get(&caller).unwrap_or(0);
+            let my_balance = balance.get(&caller).unwrap_or(0);
 
-            match _qty {
+            match qty {
                 0 => Err(Error::ZeroAmount),
-                _ if _qty > my_balance => Err(Error::InsufficientAmount),
+                _ if qty > my_balance => Err(Error::InsufficientAmount),
                 _ => Ok(()),
             }
         }
 
         // Returns the liquidity constant of the pool
-        fn getK(&self) -> Balance {
-            self.totalToken1 * self.totalToken2
+        fn get_k(&self) -> Balance {
+            self.total_token1 * self.total_token2
         }
 
         // Used to restrict withdraw & swap feature till liquidity is added to the pool
-        fn activePool(&self) -> Result<(), Error> {
-            match self.getK() {
+        fn active_pool(&self) -> Result<(), Error> {
+            match self.get_k() {
                 0 => Err(Error::ZeroLiquidity),
                 _ => Ok(()),
             }
@@ -74,66 +73,66 @@ mod amm {
 
     impl Amm {
         /// Constructs a new AMM instance
-        /// @param _fees: valid interval -> [0,1000)
+        /// @param fees: valid interval -> [0,1000)
         #[ink(constructor)]
-        pub fn new(_fees: Balance) -> Self {
+        pub fn new(fees: Balance) -> Self {
             // Sets fees to zero if not in valid range
             Self {
-                fees: if _fees >= 1000 { 0 } else { _fees },
+                fees: if fees >= 1000 { 0 } else { fees },
                 ..Default::default()
             }
         }
 
         /// Sends free token(s) to the invoker
         #[ink(message)]
-        pub fn faucet(&mut self, _amountToken1: Balance, _amountToken2: Balance) {
+        pub fn faucet(&mut self, amount_token1: Balance, amount_token2: Balance) {
             let caller = self.env().caller();
-            let token1 = self.token1Balance.get(&caller).unwrap_or(0);
-            let token2 = self.token2Balance.get(&caller).unwrap_or(0);
+            let token1 = self.token1_balance.get(&caller).unwrap_or(0);
+            let token2 = self.token2_balance.get(&caller).unwrap_or(0);
 
-            self.token1Balance.insert(caller, &(token1 + _amountToken1));
-            self.token2Balance.insert(caller, &(token2 + _amountToken2));
+            self.token1_balance.insert(caller, &(token1 + amount_token1));
+            self.token2_balance.insert(caller, &(token2 + amount_token2));
         }
 
         /// Returns the balance of the user
         #[ink(message)]
-        pub fn getMyHoldings(&self) -> (Balance, Balance, Balance) {
+        pub fn get_my_holdings(&self) -> (Balance, Balance, Balance) {
             let caller = self.env().caller();
-            let token1 = self.token1Balance.get(&caller).unwrap_or(0);
-            let token2 = self.token2Balance.get(&caller).unwrap_or(0);
-            let myShares = self.shares.get(&caller).unwrap_or(0);
-            (token1, token2, myShares)
+            let token1 = self.token1_balance.get(&caller).unwrap_or(0);
+            let token2 = self.token2_balance.get(&caller).unwrap_or(0);
+            let my_shares = self.shares.get(&caller).unwrap_or(0);
+            (token1, token2, my_shares)
         }
 
         /// Returns the amount of tokens locked in the pool,total shares issued & trading fee param
         #[ink(message)]
-        pub fn getPoolDetails(&self) -> (Balance, Balance, Balance, Balance) {
+        pub fn get_pool_details(&self) -> (Balance, Balance, Balance, Balance) {
             (
-                self.totalToken1,
-                self.totalToken2,
-                self.totalShares,
+                self.total_token1,
+                self.total_token2,
+                self.total_shares,
                 self.fees,
             )
         }
 
-        /// Returns amount of Token1 required when providing liquidity with _amountToken2 quantity of Token2
+        /// Returns amount of Token1 required when providing liquidity with amount_token2 quantity of Token2
         #[ink(message)]
-        pub fn getEquivalentToken1Estimate(
+        pub fn get_equivalent_token1_estimate(
             &self,
-            _amountToken2: Balance,
+            amount_token2: Balance,
         ) -> Result<Balance, Error> {
-            self.activePool()?;
-            Ok(self.totalToken1 * _amountToken2 / self.totalToken2)
+            self.active_pool()?;
+            Ok(self.total_token1 * amount_token2 / self.total_token2)
         }
 
-        /// Returns amount of Token2 required when providing liquidity with _amountToken1 quantity of Token1
+        /// Returns amount of Token2 required when providing liquidity with amount_token1 quantity of Token1
         #[ink(message)]
-        pub fn getEquivalentToken2Estimate(
+        pub fn get_equivalent_token2_estimate(
             &self,
-            _amountToken1: Balance,
+            amount_token1: Balance,
         ) -> Result<Balance, Error> {
-            self.activePool()?;
-            Ok(self.totalToken2 * _amountToken1 / self.totalToken1)
+            self.active_pool()?;
+            Ok(self.total_token2 * amount_token1 / self.total_token1)
         }
 
         /// Adding new liquidity in the pool
@@ -141,19 +140,19 @@ mod amm {
         #[ink(message)]
         pub fn provide(
             &mut self,
-            _amountToken1: Balance,
-            _amountToken2: Balance,
+            amount_token1: Balance,
+            amount_token2: Balance,
         ) -> Result<Balance, Error> {
-            self.validAmountCheck(&self.token1Balance, _amountToken1)?;
-            self.validAmountCheck(&self.token2Balance, _amountToken2)?;
+            self.valid_amount_check(&self.token1_balance, amount_token1)?;
+            self.valid_amount_check(&self.token2_balance, amount_token2)?;
 
             let share;
-            if self.totalShares == 0 {
+            if self.total_shares == 0 {
                 // Genesis liquidity is issued 100 Shares
                 share = 100 * super::PRECISION;
             } else {
-                let share1 = self.totalShares * _amountToken1 / self.totalToken1;
-                let share2 = self.totalShares * _amountToken2 / self.totalToken2;
+                let share1 = self.total_shares * amount_token1 / self.total_token1;
+                let share2 = self.total_shares * amount_token2 / self.total_token2;
 
                 if share1 != share2 {
                     return Err(Error::NonEquivalentValue);
@@ -166,14 +165,14 @@ mod amm {
             }
 
             let caller = self.env().caller();
-            let token1 = self.token1Balance.get(&caller).unwrap();
-            let token2 = self.token2Balance.get(&caller).unwrap();
-            self.token1Balance.insert(caller, &(token1 - _amountToken1));
-            self.token2Balance.insert(caller, &(token2 - _amountToken2));
+            let token1 = self.token1_balance.get(&caller).unwrap();
+            let token2 = self.token2_balance.get(&caller).unwrap();
+            self.token1_balance.insert(caller, &(token1 - amount_token1));
+            self.token2_balance.insert(caller, &(token2 - amount_token2));
 
-            self.totalToken1 += _amountToken1;
-            self.totalToken2 += _amountToken2;
-            self.totalShares += share;
+            self.total_token1 += amount_token1;
+            self.total_token2 += amount_token2;
+            self.total_shares += share;
 
             let shares = self.shares.get(caller).unwrap_or(0);
             self.shares.insert(&caller, &(shares + share));
@@ -181,237 +180,237 @@ mod amm {
             Ok(share)
         }
 
-        /// Returns the estimate of Token1 & Token2 that will be released on burning given _share
+        /// Returns the estimate of Token1 & Token2 that will be released on burning given share
         #[ink(message)]
-        pub fn getWithdrawEstimate(&self, _share: Balance) -> Result<(Balance, Balance), Error> {
-            self.activePool()?;
-            if _share > self.totalShares {
+        pub fn get_withdraw_estimate(&self, share: Balance) -> Result<(Balance, Balance), Error> {
+            self.active_pool()?;
+            if share > self.total_shares {
                 return Err(Error::InvalidShare);
             }
 
-            let amountToken1 = _share * self.totalToken1 / self.totalShares;
-            let amountToken2 = _share * self.totalToken2 / self.totalShares;
-            Ok((amountToken1, amountToken2))
+            let amount_token1 = share * self.total_token1 / self.total_shares;
+            let amount_token2 = share * self.total_token2 / self.total_shares;
+            Ok((amount_token1, amount_token2))
         }
 
         /// Removes liquidity from the pool and releases corresponding Token1 & Token2 to the withdrawer
         #[ink(message)]
-        pub fn withdraw(&mut self, _share: Balance) -> Result<(Balance, Balance), Error> {
+        pub fn withdraw(&mut self, share: Balance) -> Result<(Balance, Balance), Error> {
             let caller = self.env().caller();
-            self.validAmountCheck(&self.shares, _share)?;
+            self.valid_amount_check(&self.shares, share)?;
 
-            let (amountToken1, amountToken2) = self.getWithdrawEstimate(_share)?;
+            let (amount_token1, amount_token2) = self.get_withdraw_estimate(share)?;
 
             let shares = self.shares.get(caller).expect("Infallible");
-            self.shares.insert(&caller, &(shares - _share));
+            self.shares.insert(&caller, &(shares - share));
 
-            self.totalShares -= _share;
+            self.total_shares -= share;
 
-            self.totalToken1 -= amountToken1;
-            self.totalToken2 -= amountToken2;
+            self.total_token1 -= amount_token1;
+            self.total_token2 -= amount_token2;
 
-            let balance1 = self.token1Balance.get(caller).unwrap_or(0);
-            self.token1Balance
-                .insert(&caller, &(balance1 + amountToken1));
+            let balance1 = self.token1_balance.get(caller).unwrap_or(0);
+            self.token1_balance
+                .insert(&caller, &(balance1 + amount_token1));
 
-            let balance2 = self.token2Balance.get(caller).unwrap_or(0);
-            self.token2Balance
-                .insert(&caller, &(balance2 + amountToken2));
+            let balance2 = self.token2_balance.get(caller).unwrap_or(0);
+            self.token2_balance
+                .insert(&caller, &(balance2 + amount_token2));
 
-            Ok((amountToken1, amountToken2))
+            Ok((amount_token1, amount_token2))
         }
 
         /// Returns the amount of Token2 that the user will get when swapping a given amount of Token1 for Token2
         #[ink(message)]
-        pub fn getSwapToken1EstimateGivenToken1(
+        pub fn get_swap_token1_estimate_given_token1(
             &self,
-            _amountToken1: Balance,
+            amount_token1: Balance,
         ) -> Result<Balance, Error> {
-            self.activePool()?;
-            let _amountToken1 = (1000 - self.fees) * _amountToken1 / 1000; // Adjusting the fees charged
+            self.active_pool()?;
+            let amount_token1 = (1000 - self.fees) * amount_token1 / 1000; // Adjusting the fees charged
 
-            let token1After = self.totalToken1 + _amountToken1;
-            let token2After = self.getK() / token1After;
-            let mut amountToken2 = self.totalToken2 - token2After;
+            let token1_after = self.total_token1 + amount_token1;
+            let token2_after = self.get_k() / token1_after;
+            let mut amount_token2 = self.total_token2 - token2_after;
 
             // To ensure that Token2's pool is not completely depleted leading to inf:0 ratio
-            if amountToken2 == self.totalToken2 {
-                amountToken2 -= 1;
+            if amount_token2 == self.total_token2 {
+                amount_token2 -= 1;
             }
-            Ok(amountToken2)
+            Ok(amount_token2)
         }
 
-        /// Returns the amount of Token1 that the user should swap to get _amountToken2 in return
+        /// Returns the amount of Token1 that the user should swap to get amount_token2 in return
         #[ink(message)]
-        pub fn getSwapToken1EstimateGivenToken2(
+        pub fn get_swap_token1_estimate_given_token2(
             &self,
-            _amountToken2: Balance,
+            amount_token2: Balance,
         ) -> Result<Balance, Error> {
-            self.activePool()?;
-            if _amountToken2 >= self.totalToken2 {
+            self.active_pool()?;
+            if amount_token2 >= self.total_token2 {
                 return Err(Error::InsufficientLiquidity);
             }
 
-            let token2After = self.totalToken2 - _amountToken2;
-            let token1After = self.getK() / token2After;
-            let amountToken1 = (token1After - self.totalToken1) * 1000 / (1000 - self.fees);
-            Ok(amountToken1)
+            let token2_after = self.total_token2 - amount_token2;
+            let token1_after = self.get_k() / token2_after;
+            let amount_token1 = (token1_after - self.total_token1) * 1000 / (1000 - self.fees);
+            Ok(amount_token1)
         }
 
         /// Swaps given amount of Token1 to Token2 using algorithmic price determination
-        /// Swap fails if Token2 amount is less than _minToken2
+        /// Swap fails if Token2 amount is less than min_token2
         #[ink(message)]
-        pub fn swapToken1GivenToken1(
+        pub fn swap_token1_given_token1(
             &mut self,
-            _amountToken1: Balance,
-            _minToken2: Balance,
+            amount_token1: Balance,
+            min_token2: Balance,
         ) -> Result<Balance, Error> {
             let caller = self.env().caller();
-            self.validAmountCheck(&self.token1Balance, _amountToken1)?;
+            self.valid_amount_check(&self.token1_balance, amount_token1)?;
 
-            let amountToken2 = self.getSwapToken1EstimateGivenToken1(_amountToken1)?;
-            if amountToken2 < _minToken2 {
+            let amount_token2 = self.get_swap_token1_estimate_given_token1(amount_token1)?;
+            if amount_token2 < min_token2 {
                 return Err(Error::SlippageExceeded);
             }
 
-            let balance1 = self.token1Balance.get(caller).expect("Infallible");
-            self.token1Balance
-                .insert(&caller, &(balance1 - _amountToken1));
+            let balance1 = self.token1_balance.get(caller).expect("Infallible");
+            self.token1_balance
+                .insert(&caller, &(balance1 - amount_token1));
 
-            self.totalToken1 += _amountToken1;
-            self.totalToken2 -= amountToken2;
+            self.total_token1 += amount_token1;
+            self.total_token2 -= amount_token2;
 
-            let balance2 = self.token2Balance.get(caller).unwrap_or(0);
-            self.token2Balance
-                .insert(&caller, &(balance2 + amountToken2));
+            let balance2 = self.token2_balance.get(caller).unwrap_or(0);
+            self.token2_balance
+                .insert(&caller, &(balance2 + amount_token2));
 
-            Ok(amountToken2)
+            Ok(amount_token2)
         }
 
         /// Swaps given amount of Token1 to Token2 using algorithmic price determination
-        /// Swap fails if amount of Token1 required to obtain _amountToken2 exceeds _maxToken1
+        /// Swap fails if amount of Token1 required to obtain amount_token2 exceeds max_token1
         #[ink(message)]
-        pub fn swapToken1GivenToken2(
+        pub fn swap_token1_given_token2(
             &mut self,
-            _amountToken2: Balance,
-            _maxToken1: Balance,
+            amount_token2: Balance,
+            max_token1: Balance,
         ) -> Result<Balance, Error> {
             let caller = self.env().caller();
-            let amountToken1 = self.getSwapToken1EstimateGivenToken2(_amountToken2)?;
-            if amountToken1 > _maxToken1 {
+            let amount_token1 = self.get_swap_token1_estimate_given_token2(amount_token2)?;
+            if amount_token1 > max_token1 {
                 return Err(Error::SlippageExceeded);
             }
-            self.validAmountCheck(&self.token1Balance, amountToken1)?;
+            self.valid_amount_check(&self.token1_balance, amount_token1)?;
 
-            let balance1 = self.token1Balance.get(caller).expect("Infallible");
-            self.token1Balance
-                .insert(&caller, &(balance1 - amountToken1));
+            let balance1 = self.token1_balance.get(caller).expect("Infallible");
+            self.token1_balance
+                .insert(&caller, &(balance1 - amount_token1));
 
-            self.totalToken1 += amountToken1;
-            self.totalToken2 -= _amountToken2;
+            self.total_token1 += amount_token1;
+            self.total_token2 -= amount_token2;
 
-            let balance2 = self.token2Balance.get(caller).unwrap_or(0);
-            self.token2Balance
-                .insert(&caller, &(balance2 + _amountToken2));
+            let balance2 = self.token2_balance.get(caller).unwrap_or(0);
+            self.token2_balance
+                .insert(&caller, &(balance2 + amount_token2));
 
-            Ok(amountToken1)
+            Ok(amount_token1)
         }
 
         /// Returns the amount of Token2 that the user will get when swapping a given amount of Token1 for Token2
         #[ink(message)]
-        pub fn getSwapToken2EstimateGivenToken2(
+        pub fn get_swap_token2_estimate_given_token2(
             &self,
-            _amountToken2: Balance,
+            amount_token2: Balance,
         ) -> Result<Balance, Error> {
-            self.activePool()?;
-            let _amountToken2 = (1000 - self.fees) * _amountToken2 / 1000; // Adjusting the fees charged
+            self.active_pool()?;
+            let amount_token2 = (1000 - self.fees) * amount_token2 / 1000; // Adjusting the fees charged
 
-            let token2After = self.totalToken2 + _amountToken2;
-            let token1After = self.getK() / token2After;
-            let mut amountToken1 = self.totalToken1 - token1After;
+            let token2_after = self.total_token2 + amount_token2;
+            let token1_after = self.get_k() / token2_after;
+            let mut amount_token1 = self.total_token1 - token1_after;
 
             // To ensure that Token1's pool is not completely depleted leading to inf:0 ratio
-            if amountToken1 == self.totalToken1 {
-                amountToken1 -= 1;
+            if amount_token1 == self.total_token1 {
+                amount_token1 -= 1;
             }
-            Ok(amountToken1)
+            Ok(amount_token1)
         }
 
-        /// Returns the amount of Token2 that the user should swap to get _amountToken1 in return
+        /// Returns the amount of Token2 that the user should swap to get amount_token1 in return
         #[ink(message)]
-        pub fn getSwapToken2EstimateGivenToken1(
+        pub fn get_swap_token2_estimate_given_token1(
             &self,
-            _amountToken1: Balance,
+            amount_token1: Balance,
         ) -> Result<Balance, Error> {
-            self.activePool()?;
-            if _amountToken1 >= self.totalToken1 {
+            self.active_pool()?;
+            if amount_token1 >= self.total_token1 {
                 return Err(Error::InsufficientLiquidity);
             }
 
-            let token1After = self.totalToken1 - _amountToken1;
-            let token2After = self.getK() / token1After;
-            let amountToken2 = (token2After - self.totalToken2) * 1000 / (1000 - self.fees);
-            Ok(amountToken2)
+            let token1_after = self.total_token1 - amount_token1;
+            let token2_after = self.get_k() / token1_after;
+            let amount_token2 = (token2_after - self.total_token2) * 1000 / (1000 - self.fees);
+            Ok(amount_token2)
         }
 
         /// Swaps given amount of Token2 to Token1 using algorithmic price determination
-        /// Swap fails if Token1 amount is less than _minToken1
+        /// Swap fails if Token1 amount is less than min_token1
         #[ink(message)]
-        pub fn swapToken2GivenToken2(
+        pub fn swap_token2_given_token2(
             &mut self,
-            _amountToken2: Balance,
-            _minToken1: Balance,
+            amount_token2: Balance,
+            min_token1: Balance,
         ) -> Result<Balance, Error> {
             let caller = self.env().caller();
-            self.validAmountCheck(&self.token2Balance, _amountToken2)?;
+            self.valid_amount_check(&self.token2_balance, amount_token2)?;
 
-            let amountToken1 = self.getSwapToken2EstimateGivenToken2(_amountToken2)?;
-            if amountToken1 < _minToken1 {
+            let amount_token1 = self.get_swap_token2_estimate_given_token2(amount_token2)?;
+            if amount_token1 < min_token1 {
                 return Err(Error::SlippageExceeded);
             }
 
-            let balance2 = self.token2Balance.get(caller).expect("Infallible");
-            self.token2Balance
-                .insert(&caller, &(balance2 - _amountToken2));
+            let balance2 = self.token2_balance.get(caller).expect("Infallible");
+            self.token2_balance
+                .insert(&caller, &(balance2 - amount_token2));
 
-            self.totalToken2 += _amountToken2;
-            self.totalToken1 -= amountToken1;
+            self.total_token2 += amount_token2;
+            self.total_token1 -= amount_token1;
 
-            let balance1 = self.token1Balance.get(caller).unwrap_or(0);
-            self.token1Balance
-                .insert(&caller, &(balance1 - amountToken1));
+            let balance1 = self.token1_balance.get(caller).unwrap_or(0);
+            self.token1_balance
+                .insert(&caller, &(balance1 - amount_token1));
 
-            Ok(amountToken1)
+            Ok(amount_token1)
         }
 
         /// Swaps given amount of Token2 to Token1 using algorithmic price determination
-        /// Swap fails if amount of Token2 required to obtain _amountToken1 exceeds _maxToken2
+        /// Swap fails if amount of Token2 required to obtain amount_token1 exceeds max_token2
         #[ink(message)]
-        pub fn swapToken2GivenToken1(
+        pub fn swap_token2_given_token1(
             &mut self,
-            _amountToken1: Balance,
-            _maxToken2: Balance,
+            amount_token1: Balance,
+            max_token2: Balance,
         ) -> Result<Balance, Error> {
             let caller = self.env().caller();
 
-            let amountToken2 = self.getSwapToken2EstimateGivenToken1(_amountToken1)?;
-            if amountToken2 > _maxToken2 {
+            let amount_token2 = self.get_swap_token2_estimate_given_token1(amount_token1)?;
+            if amount_token2 > max_token2 {
                 return Err(Error::SlippageExceeded);
             }
-            self.validAmountCheck(&self.token2Balance, amountToken2)?;
+            self.valid_amount_check(&self.token2_balance, amount_token2)?;
 
-            let balance2 = self.token2Balance.get(caller).expect("Infallible");
-            self.token2Balance
-                .insert(&caller, &(balance2 - amountToken2));
+            let balance2 = self.token2_balance.get(caller).expect("Infallible");
+            self.token2_balance
+                .insert(&caller, &(balance2 - amount_token2));
 
-            self.totalToken2 += amountToken2;
-            self.totalToken1 -= _amountToken1;
+            self.total_token2 += amount_token2;
+            self.total_token1 -= amount_token1;
 
-            let balance1 = self.token1Balance.get(caller).unwrap_or(0);
-            self.token1Balance
-                .insert(&caller, &(balance1 - _amountToken1));
+            let balance1 = self.token1_balance.get(caller).unwrap_or(0);
+            self.token1_balance
+                .insert(&caller, &(balance1 - amount_token1));
 
-            Ok(amountToken2)
+            Ok(amount_token2)
         }
     }
 
@@ -422,21 +421,21 @@ mod amm {
         #[ink::test]
         fn new_works() {
             let contract = Amm::new(0);
-            assert_eq!(contract.getMyHoldings(), (0, 0, 0));
-            assert_eq!(contract.getPoolDetails(), (0, 0, 0, 0));
+            assert_eq!(contract.get_my_holdings(), (0, 0, 0));
+            assert_eq!(contract.get_pool_details(), (0, 0, 0, 0));
         }
 
         #[ink::test]
         fn faucet_works() {
             let mut contract = Amm::new(0);
             contract.faucet(100, 200);
-            assert_eq!(contract.getMyHoldings(), (100, 200, 0));
+            assert_eq!(contract.get_my_holdings(), (100, 200, 0));
         }
 
         #[ink::test]
         fn zero_liquidity_test() {
             let contract = Amm::new(0);
-            let res = contract.getEquivalentToken1Estimate(5);
+            let res = contract.get_equivalent_token1_estimate(5);
             assert_eq!(res, Err(Error::ZeroLiquidity));
         }
 
@@ -446,8 +445,8 @@ mod amm {
             contract.faucet(100, 200);
             let share = contract.provide(10, 20).unwrap();
             assert_eq!(share, 100_000_000);
-            assert_eq!(contract.getPoolDetails(), (10, 20, share, 0));
-            assert_eq!(contract.getMyHoldings(), (90, 180, share));
+            assert_eq!(contract.get_pool_details(), (10, 20, share, 0));
+            assert_eq!(contract.get_my_holdings(), (90, 180, share));
         }
 
         #[ink::test]
@@ -456,8 +455,8 @@ mod amm {
             contract.faucet(100, 200);
             let share = contract.provide(10, 20).unwrap();
             assert_eq!(contract.withdraw(share / 5).unwrap(), (2, 4));
-            assert_eq!(contract.getMyHoldings(), (92, 184, 4 * share / 5));
-            assert_eq!(contract.getPoolDetails(), (8, 16, 4 * share / 5, 0));
+            assert_eq!(contract.get_my_holdings(), (92, 184, 4 * share / 5));
+            assert_eq!(contract.get_pool_details(), (8, 16, 4 * share / 5, 0));
         }
 
         #[ink::test]
@@ -465,10 +464,10 @@ mod amm {
             let mut contract = Amm::new(0);
             contract.faucet(100, 200);
             let share = contract.provide(50, 100).unwrap();
-            let amountToken2 = contract.swapToken1GivenToken1(50, 50).unwrap();
-            assert_eq!(amountToken2, 50);
-            assert_eq!(contract.getMyHoldings(), (0, 150, share));
-            assert_eq!(contract.getPoolDetails(), (100, 50, share, 0));
+            let amount_token2 = contract.swap_token1_given_token1(50, 50).unwrap();
+            assert_eq!(amount_token2, 50);
+            assert_eq!(contract.get_my_holdings(), (0, 150, share));
+            assert_eq!(contract.get_pool_details(), (100, 50, share, 0));
         }
 
         #[ink::test]
@@ -476,10 +475,10 @@ mod amm {
             let mut contract = Amm::new(0);
             contract.faucet(100, 200);
             let share = contract.provide(50, 100).unwrap();
-            let amountToken2 = contract.swapToken1GivenToken1(50, 51);
-            assert_eq!(amountToken2, Err(Error::SlippageExceeded));
-            assert_eq!(contract.getMyHoldings(), (50, 100, share));
-            assert_eq!(contract.getPoolDetails(), (50, 100, share, 0));
+            let amount_token2 = contract.swap_token1_given_token1(50, 51);
+            assert_eq!(amount_token2, Err(Error::SlippageExceeded));
+            assert_eq!(contract.get_my_holdings(), (50, 100, share));
+            assert_eq!(contract.get_pool_details(), (50, 100, share, 0));
         }
 
         #[ink::test]
@@ -487,8 +486,8 @@ mod amm {
             let mut contract = Amm::new(100);
             contract.faucet(100, 200);
             contract.provide(50, 100).unwrap();
-            let amountToken2 = contract.getSwapToken1EstimateGivenToken1(50).unwrap();
-            assert_eq!(amountToken2, 48);
+            let amount_token2 = contract.get_swap_token1_estimate_given_token1(50).unwrap();
+            assert_eq!(amount_token2, 48);
         }
     }
 }

@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x5fb4a66b9849e463204ec6da86a4c9972de2cb04d130b99ba58f70bc8476d4f0",
+    "hash": "0x9e8aac75cd2c5927a7e83e9ae3d3dc542ee12614658309e44ec41a0b7f26b5ee",
     "language": "ink! 4.2.1",
     "compiler": "rustc 1.70.0",
     "build_info": {
@@ -25,7 +25,7 @@
       {
         "args": [
           {
-            "label": "_fees",
+            "label": "fees",
             "type": {
               "displayName": [
                 "Balance"
@@ -37,7 +37,7 @@
         "default": false,
         "docs": [
           "Constructs a new AMM instance",
-          "@param _fees: valid interval -> [0,1000)"
+          "@param fees: valid interval -> [0,1000)"
         ],
         "label": "new",
         "payable": false,
@@ -103,7 +103,7 @@
       {
         "args": [
           {
-            "label": "_amountToken1",
+            "label": "amount_token1",
             "type": {
               "displayName": [
                 "Balance"
@@ -112,7 +112,7 @@
             }
           },
           {
-            "label": "_amountToken2",
+            "label": "amount_token2",
             "type": {
               "displayName": [
                 "Balance"
@@ -143,7 +143,7 @@
         "docs": [
           " Returns the balance of the user"
         ],
-        "label": "getMyHoldings",
+        "label": "get_my_holdings",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -153,7 +153,7 @@
           ],
           "type": 4
         },
-        "selector": "0x4646fd22"
+        "selector": "0xc95a653e"
       },
       {
         "args": [],
@@ -161,7 +161,7 @@
         "docs": [
           " Returns the amount of tokens locked in the pool,total shares issued & trading fee param"
         ],
-        "label": "getPoolDetails",
+        "label": "get_pool_details",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -171,12 +171,12 @@
           ],
           "type": 6
         },
-        "selector": "0xc1d33772"
+        "selector": "0x819c76c4"
       },
       {
         "args": [
           {
-            "label": "_amountToken2",
+            "label": "amount_token2",
             "type": {
               "displayName": [
                 "Balance"
@@ -187,9 +187,9 @@
         ],
         "default": false,
         "docs": [
-          " Returns amount of Token1 required when providing liquidity with _amountToken2 quantity of Token2"
+          " Returns amount of Token1 required when providing liquidity with amount_token2 quantity of Token2"
         ],
-        "label": "getEquivalentToken1Estimate",
+        "label": "get_equivalent_token1_estimate",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -199,12 +199,12 @@
           ],
           "type": 8
         },
-        "selector": "0x3814b1f7"
+        "selector": "0x24ccf381"
       },
       {
         "args": [
           {
-            "label": "_amountToken1",
+            "label": "amount_token1",
             "type": {
               "displayName": [
                 "Balance"
@@ -215,9 +215,9 @@
         ],
         "default": false,
         "docs": [
-          " Returns amount of Token2 required when providing liquidity with _amountToken1 quantity of Token1"
+          " Returns amount of Token2 required when providing liquidity with amount_token1 quantity of Token1"
         ],
-        "label": "getEquivalentToken2Estimate",
+        "label": "get_equivalent_token2_estimate",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -227,12 +227,12 @@
           ],
           "type": 8
         },
-        "selector": "0x5a431238"
+        "selector": "0xab9b6564"
       },
       {
         "args": [
           {
-            "label": "_amountToken1",
+            "label": "amount_token1",
             "type": {
               "displayName": [
                 "Balance"
@@ -241,7 +241,7 @@
             }
           },
           {
-            "label": "_amountToken2",
+            "label": "amount_token2",
             "type": {
               "displayName": [
                 "Balance"
@@ -270,7 +270,7 @@
       {
         "args": [
           {
-            "label": "_share",
+            "label": "share",
             "type": {
               "displayName": [
                 "Balance"
@@ -281,9 +281,9 @@
         ],
         "default": false,
         "docs": [
-          " Returns the estimate of Token1 & Token2 that will be released on burning given _share"
+          " Returns the estimate of Token1 & Token2 that will be released on burning given share"
         ],
-        "label": "getWithdrawEstimate",
+        "label": "get_withdraw_estimate",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -293,12 +293,12 @@
           ],
           "type": 11
         },
-        "selector": "0x4d684150"
+        "selector": "0xb457d6c8"
       },
       {
         "args": [
           {
-            "label": "_share",
+            "label": "share",
             "type": {
               "displayName": [
                 "Balance"
@@ -326,7 +326,7 @@
       {
         "args": [
           {
-            "label": "_amountToken1",
+            "label": "amount_token1",
             "type": {
               "displayName": [
                 "Balance"
@@ -339,7 +339,7 @@
         "docs": [
           " Returns the amount of Token2 that the user will get when swapping a given amount of Token1 for Token2"
         ],
-        "label": "getSwapToken1EstimateGivenToken1",
+        "label": "get_swap_token1_estimate_given_token1",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -349,12 +349,12 @@
           ],
           "type": 8
         },
-        "selector": "0x6bc9f484"
+        "selector": "0xe854d7d1"
       },
       {
         "args": [
           {
-            "label": "_amountToken2",
+            "label": "amount_token2",
             "type": {
               "displayName": [
                 "Balance"
@@ -365,9 +365,9 @@
         ],
         "default": false,
         "docs": [
-          " Returns the amount of Token1 that the user should swap to get _amountToken2 in return"
+          " Returns the amount of Token1 that the user should swap to get amount_token2 in return"
         ],
-        "label": "getSwapToken1EstimateGivenToken2",
+        "label": "get_swap_token1_estimate_given_token2",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -377,12 +377,12 @@
           ],
           "type": 8
         },
-        "selector": "0x397bf950"
+        "selector": "0xf04419b4"
       },
       {
         "args": [
           {
-            "label": "_amountToken1",
+            "label": "amount_token1",
             "type": {
               "displayName": [
                 "Balance"
@@ -391,7 +391,7 @@
             }
           },
           {
-            "label": "_minToken2",
+            "label": "min_token2",
             "type": {
               "displayName": [
                 "Balance"
@@ -403,9 +403,9 @@
         "default": false,
         "docs": [
           " Swaps given amount of Token1 to Token2 using algorithmic price determination",
-          " Swap fails if Token2 amount is less than _minToken2"
+          " Swap fails if Token2 amount is less than min_token2"
         ],
-        "label": "swapToken1GivenToken1",
+        "label": "swap_token1_given_token1",
         "mutates": true,
         "payable": false,
         "returnType": {
@@ -415,12 +415,12 @@
           ],
           "type": 8
         },
-        "selector": "0x8adf0584"
+        "selector": "0x48395d65"
       },
       {
         "args": [
           {
-            "label": "_amountToken2",
+            "label": "amount_token2",
             "type": {
               "displayName": [
                 "Balance"
@@ -429,7 +429,7 @@
             }
           },
           {
-            "label": "_maxToken1",
+            "label": "max_token1",
             "type": {
               "displayName": [
                 "Balance"
@@ -441,9 +441,9 @@
         "default": false,
         "docs": [
           " Swaps given amount of Token1 to Token2 using algorithmic price determination",
-          " Swap fails if amount of Token1 required to obtain _amountToken2 exceeds _maxToken1"
+          " Swap fails if amount of Token1 required to obtain amount_token2 exceeds max_token1"
         ],
-        "label": "swapToken1GivenToken2",
+        "label": "swap_token1_given_token2",
         "mutates": true,
         "payable": false,
         "returnType": {
@@ -453,12 +453,12 @@
           ],
           "type": 8
         },
-        "selector": "0x3f4171b1"
+        "selector": "0xa771453b"
       },
       {
         "args": [
           {
-            "label": "_amountToken2",
+            "label": "amount_token2",
             "type": {
               "displayName": [
                 "Balance"
@@ -471,7 +471,7 @@
         "docs": [
           " Returns the amount of Token2 that the user will get when swapping a given amount of Token1 for Token2"
         ],
-        "label": "getSwapToken2EstimateGivenToken2",
+        "label": "get_swap_token2_estimate_given_token2",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -481,12 +481,12 @@
           ],
           "type": 8
         },
-        "selector": "0xee312671"
+        "selector": "0xec7e1a49"
       },
       {
         "args": [
           {
-            "label": "_amountToken1",
+            "label": "amount_token1",
             "type": {
               "displayName": [
                 "Balance"
@@ -497,9 +497,9 @@
         ],
         "default": false,
         "docs": [
-          " Returns the amount of Token2 that the user should swap to get _amountToken1 in return"
+          " Returns the amount of Token2 that the user should swap to get amount_token1 in return"
         ],
-        "label": "getSwapToken2EstimateGivenToken1",
+        "label": "get_swap_token2_estimate_given_token1",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -509,12 +509,12 @@
           ],
           "type": 8
         },
-        "selector": "0xe20b04d7"
+        "selector": "0xece7a514"
       },
       {
         "args": [
           {
-            "label": "_amountToken2",
+            "label": "amount_token2",
             "type": {
               "displayName": [
                 "Balance"
@@ -523,7 +523,7 @@
             }
           },
           {
-            "label": "_minToken1",
+            "label": "min_token1",
             "type": {
               "displayName": [
                 "Balance"
@@ -535,9 +535,9 @@
         "default": false,
         "docs": [
           " Swaps given amount of Token2 to Token1 using algorithmic price determination",
-          " Swap fails if Token1 amount is less than _minToken1"
+          " Swap fails if Token1 amount is less than min_token1"
         ],
-        "label": "swapToken2GivenToken2",
+        "label": "swap_token2_given_token2",
         "mutates": true,
         "payable": false,
         "returnType": {
@@ -547,12 +547,12 @@
           ],
           "type": 8
         },
-        "selector": "0xa28d3f0a"
+        "selector": "0x7c8177ae"
       },
       {
         "args": [
           {
-            "label": "_amountToken1",
+            "label": "amount_token1",
             "type": {
               "displayName": [
                 "Balance"
@@ -561,7 +561,7 @@
             }
           },
           {
-            "label": "_maxToken2",
+            "label": "max_token2",
             "type": {
               "displayName": [
                 "Balance"
@@ -573,9 +573,9 @@
         "default": false,
         "docs": [
           " Swaps given amount of Token2 to Token1 using algorithmic price determination",
-          " Swap fails if amount of Token2 required to obtain _amountToken1 exceeds _maxToken2"
+          " Swap fails if amount of Token2 required to obtain amount_token1 exceeds max_token2"
         ],
-        "label": "swapToken2GivenToken1",
+        "label": "swap_token2_given_token1",
         "mutates": true,
         "payable": false,
         "returnType": {
@@ -585,7 +585,7 @@
           ],
           "type": 8
         },
-        "selector": "0x1ccb6598"
+        "selector": "0xf8be2254"
       }
     ]
   },
@@ -601,7 +601,7 @@
                   "ty": 0
                 }
               },
-              "name": "totalShares"
+              "name": "total_shares"
             },
             {
               "layout": {
@@ -610,7 +610,7 @@
                   "ty": 0
                 }
               },
-              "name": "totalToken1"
+              "name": "total_token1"
             },
             {
               "layout": {
@@ -619,7 +619,7 @@
                   "ty": 0
                 }
               },
-              "name": "totalToken2"
+              "name": "total_token2"
             },
             {
               "layout": {
@@ -640,28 +640,28 @@
                 "root": {
                   "layout": {
                     "leaf": {
-                      "key": "0x2e237639",
+                      "key": "0xe717d004",
                       "ty": 0
                     }
                   },
-                  "root_key": "0x2e237639"
+                  "root_key": "0xe717d004"
                 }
               },
-              "name": "token1Balance"
+              "name": "token1_balance"
             },
             {
               "layout": {
                 "root": {
                   "layout": {
                     "leaf": {
-                      "key": "0xc7714eb7",
+                      "key": "0x0402f4cb",
                       "ty": 0
                     }
                   },
-                  "root_key": "0xc7714eb7"
+                  "root_key": "0x0402f4cb"
                 }
               },
-              "name": "token2Balance"
+              "name": "token2_balance"
             },
             {
               "layout": {
