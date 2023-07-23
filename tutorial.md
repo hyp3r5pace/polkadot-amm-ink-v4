@@ -554,7 +554,7 @@ This will generate the artifacts at `./target/ink`. We will use the `amm.wasm` a
 
 Next, we need to fund our address to interact with the network. Go to the [faucet](https://faucet.test.azero.dev/) to get some Aleph Zero testnet tokens (AZERO). 
 
-Now visit [https://polkadot.js.org/apps](https://polkadot.js.org/apps) and switch to the Jupiter testnet. You can do this by clicking on the chain logo available on the top-left of the navbar where you will see a list of available networks. Move to the *"TEST NETWORKS"* section and search for a network called **Jupiter**. Select it and scroll back to the top and click on *Switch*.
+Now visit [https://contracts-ui.substrate.io/add-contract](https://contracts-ui.substrate.io/add-contract) and switch to the Aleph Zero testnet. You can do this by clicking on the drop-down component available on the top-left of the navbar where you will see a list of available networks. Move to the *"TEST NETWORKS"* section and search for a network called **ALEPH ZERO TESTNET**. Select it and the network will switch to **ALEPH ZERO TESTNET**.
 
 ![Switch Network](public/polkadot-js.png)
 
